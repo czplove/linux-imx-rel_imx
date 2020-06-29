@@ -78,6 +78,8 @@ static irqreturn_t gpio_ir_recv_irq(int irq, void *dev_id)
 	int rc = 0;
 	enum raw_event_type type = IR_SPACE;
 
+	//printk("*********************** function:%s, line = %d\n", __FUNCTION__, __LINE__);
+
 	gval = gpio_get_value_cansleep(gpio_dev->gpio_nr);
 
 	if (gval < 0)

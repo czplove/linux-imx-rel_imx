@@ -121,7 +121,10 @@ int inv_mpu6050_probe_trigger(struct iio_dev *indio_dev)
 					  indio_dev->name,
 					  indio_dev->id);
 	if (!st->trig)
+	{
+		printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
 		return -ENOMEM;
+	}
 
 	ret = devm_request_irq(&indio_dev->dev, st->client->irq,
 			       &iio_trigger_generic_data_rdy_poll,
@@ -129,7 +132,10 @@ int inv_mpu6050_probe_trigger(struct iio_dev *indio_dev)
 			       "inv_mpu",
 			       st->trig);
 	if (ret)
+	{
+		printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
 		return ret;
+	}
 
 	st->trig->dev.parent = &st->client->dev;
 	st->trig->ops = &inv_mpu_trigger_ops;
@@ -139,6 +145,7 @@ int inv_mpu6050_probe_trigger(struct iio_dev *indio_dev)
 	if (ret)
 		return ret;
 
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
 	indio_dev->trig = iio_trigger_get(st->trig);
 
 	return 0;

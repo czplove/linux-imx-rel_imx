@@ -624,6 +624,26 @@ config TILE_SROM
 	  device appear much like a simple EEPROM, and knows
 	  how to partition a single ROM for multiple purposes.
 
+config LITEON_AP3216C
+        tristate "Lite-On Three-in-one Environmental Sensor ap3216c Support"
+        help
+          To compile this driver as a module, choose M here: the module
+          will be called ap3216c.
+
+          If unsure, it is safe to say Y.
+
+config RELAY_CTL
+        bool "Enable RELAY config"
+        default y
+        help
+          Enable RELAY config
+
+config STEP_MOTOR_CTL
+        bool "Enable STEP_MOTOR config"
+        default y
+        help
+          Enable STEP_MOTOR config
+
 source "drivers/char/xillybus/Kconfig"
 
 source "drivers/char/imx_amp/Kconfig"

@@ -729,7 +729,7 @@ static int inv_check_and_setup_chip(struct inv_mpu6050_state *st,
 	st->chip_type = INV_MPU6050;
 	st->hw  = &hw_info[st->chip_type];
 	st->reg = hw_info[st->chip_type].reg;
-
+#if 0
 	/* reset to make sure previous state are not there */
 	result = inv_mpu6050_write_reg(st, st->reg->pwr_mgmt_1,
 					INV_MPU6050_BIT_H_RESET);
@@ -755,7 +755,7 @@ static int inv_check_and_setup_chip(struct inv_mpu6050_state *st,
 					INV_MPU6050_BIT_PWR_GYRO_STBY);
 	if (result)
 		return result;
-
+#endif
 	return 0;
 }
 
@@ -774,9 +774,13 @@ static int inv_mpu_probe(struct i2c_client *client,
 	struct inv_mpu6050_platform_data *pdata;
 	int result;
 
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
+
 	if (!i2c_check_functionality(client->adapter,
 		I2C_FUNC_SMBUS_I2C_BLOCK))
 		return -ENOSYS;
+
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
 
 	indio_dev = devm_iio_device_alloc(&client->dev, sizeof(*st));
 	if (!indio_dev)
@@ -788,17 +792,24 @@ static int inv_mpu_probe(struct i2c_client *client,
 	pdata = dev_get_platdata(&client->dev);
 	if (pdata)
 		st->plat_data = *pdata;
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
+#if 1
 	/* power is turned on inside check chip type*/
 	result = inv_check_and_setup_chip(st, id);
 	if (result)
 		return result;
-
+#endif
+#if 1
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
 	result = inv_mpu6050_init_config(indio_dev);
 	if (result) {
 		dev_err(&client->dev,
 			"Could not initialize device.\n");
 		return result;
 	}
+#endif
+
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
 
 	i2c_set_clientdata(client, indio_dev);
 	indio_dev->dev.parent = &client->dev;
@@ -828,6 +839,8 @@ static int inv_mpu_probe(struct i2c_client *client,
 		goto out_unreg_ring;
 	}
 
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
+
 	INIT_KFIFO(st->timestamps);
 	spin_lock_init(&st->time_stamp_lock);
 	result = iio_device_register(indio_dev);
@@ -851,6 +864,48 @@ static int inv_mpu_probe(struct i2c_client *client,
 	if (result)
 		goto out_del_mux;
 
+	//printk("********************* fun:%s, line = %d\n", __FUNCTION__, __LINE__);
+#if 0
+	{
+		u16 data;
+		u8 value;
+#if 1	
+		value = 0x00;
+		i2c_smbus_write_i2c_block_data(st->client, 0x6B, 1, &value);
+
+		value = 0x07;
+                i2c_smbus_write_i2c_block_data(st->client, 0x19, 1, &value);
+
+		value = 0x06;
+                i2c_smbus_write_i2c_block_data(st->client, 0x1A, 1, &value);
+
+		value = 0x01;
+                i2c_smbus_write_i2c_block_data(st->client, 0x1C, 1, &value);
+		msleep(100);
+#endif
+
+		while(1){
+			msleep(500);
+			printk("\n\n");
+#if 1
+			i2c_smbus_read_i2c_block_data(st->client, 0x3B, 2, &data);
+			printk("ACCE_X:%6d\n", data);
+			i2c_smbus_read_i2c_block_data(st->client, 0x3D, 2, &data);
+                	printk("ACCE_Y:%6d\n", data);
+			i2c_smbus_read_i2c_block_data(st->client, 0x3F, 2, &data);
+                	printk("ACCE_Z:%6d\n", data);
+			i2c_smbus_read_i2c_block_data(st->client, 0x43, 2, &data);
+                	printk("GYRO_X:%6d\n", data);
+			i2c_smbus_read_i2c_block_data(st->client, 0x45, 2, &data);
+                	printk("GYRO_Y:%6d\n", data);
+			i2c_smbus_read_i2c_block_data(st->client, 0x47, 2, &data);
+                	printk("GYRO_Z:%6d\n", data);
+#endif
+			i2c_smbus_read_i2c_block_data(st->client, 0x19, 1, &value);
+                	printk("SMPLRT_DIV:%6d\n", value);
+		}
+	}
+#endif
 	return 0;
 
 out_del_mux:
@@ -916,6 +971,12 @@ static const struct acpi_device_id inv_acpi_match[] = {
 
 MODULE_DEVICE_TABLE(acpi, inv_acpi_match);
 
+static const struct of_device_id mpu6050_of_match[] = {
+    { .compatible = "mpu6050,INV_MPU6050", },
+    {  }
+};
+MODULE_DEVICE_TABLE(of, mpu6050_of_match);
+
 static struct i2c_driver inv_mpu_driver = {
 	.probe		=	inv_mpu_probe,
 	.remove		=	inv_mpu_remove,
@@ -924,7 +985,8 @@ static struct i2c_driver inv_mpu_driver = {
 		.owner	=	THIS_MODULE,
 		.name	=	"inv-mpu6050",
 		.pm     =       INV_MPU6050_PMOPS,
-		.acpi_match_table = ACPI_PTR(inv_acpi_match),
+		//.acpi_match_table = ACPI_PTR(inv_acpi_match),
+		.of_match_table = of_match_ptr(mpu6050_of_match),
 	},
 };
 

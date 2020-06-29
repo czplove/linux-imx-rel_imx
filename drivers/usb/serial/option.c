@@ -1805,6 +1805,15 @@ static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE_INTERFACE_CLASS(0x2020, 0x4000, 0xff) },                /* OLICARD300 - MT6225 */
 	{ USB_DEVICE(INOVIA_VENDOR_ID, INOVIA_SEW858) },
 	{ USB_DEVICE(VIATELECOM_VENDOR_ID, VIATELECOM_PRODUCT_CDS7) },
+
+	/* add support EC220 4G Module */
+        { USB_DEVICE(0x05C6, 0x9090) }, /* Quectel UC15 */
+        { USB_DEVICE(0x05C6, 0x9003) }, /* Quectel UC20 */
+        { USB_DEVICE(0x05C6, 0x9215) }, /* Quectel EC20 */
+        { USB_DEVICE(0x2C7C, 0x0125) }, /* Quectel EC25/EC20 R2.0 */
+        { USB_DEVICE(0x2C7C, 0x0121) }, /* Quectel EC21 */
+	/* end add */
+
 	{ } /* Terminating entry */
 };
 MODULE_DEVICE_TABLE(usb, option_ids);
