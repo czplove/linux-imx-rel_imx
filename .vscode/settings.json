@@ -6,6 +6,7 @@
         "**/*.su":true,  
         "**/*.cmd":true, 
         "Documentation":true,  
+        "search.followSymlinks": false,
  
         /* 屏蔽不用的架构相关的文件 */ 
         "arch/alpha":true, 
